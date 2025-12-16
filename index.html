@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Schedule Filter</title>
+    <style>
+        :root {
+            --color-primary: #208090;
+            --color-primary-hover: #1a6672;
+            --color-bg: #fcfcf9;
+            --color-surface: #ffffff;
+            --color-text: #134252;
+            --color-text-secondary: #626c7c;
+            --color-border: #d4d4d4;
+            --color-success: #2fb8c6;
+            --color-warning: #e8815d;
+            --color-off: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 30px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .filters-section {
+            background: var(--color-surface);
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid var(--color-border);
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            color: var(--color-text);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 150ms ease;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--color-primary);
+            background-color: #f0f8f9;
+        }
+
+        .filter-btn.active {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .reset-btn {
+            padding: 8px 16px;
+            background-color: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 150ms ease;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .reset-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .results-info {
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .schedule-table thead {
+            background-color: #f8f8f6;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .schedule-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--color-text);
+            border-right: 1px solid var(--color-border);
+        }
+
+        .schedule-table th:last-child {
+            border-right: none;
+        }
+
+        .schedule-table td {
+            padding: 12px 16px;
+            border-right: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 13px;
+        }
+
+        .schedule-table td:last-child {
+            border-right: none;
+        }
+
+        .schedule-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schedule-table tbody tr:hover {
+            background-color: #fafaf8;
+        }
+
+        .name-cell {
+            font-weight: 500;
+            color: var(--color-text);
+            min-width: 150px;
+        }
+
+        .shift-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .shift-am {
+            background-color: rgba(32, 128, 144, 0.1);
+            color: #1a6672;
+        }
+
+        .shift-pm {
+            background-color: rgba(232, 129, 93, 0.1);
+            color: #a84b2f;
+        }
+
+        .shift-mid {
+            background-color: rgba(45, 166, 178, 0.1);
+            color: #2da6b2;
+        }
+
+        .shift-set {
+            background-color: #e8e8e8;
+            color: #666;
+        }
+
+        .shift-off {
+            background-color: #f5f5f5;
+            color: #999;
+        }
+
+        .shift-req {
+            background-color: rgba(192, 21, 47, 0.15);
+            color: #c0152f;
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .filters-section {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-table {
+                font-size: 12px;
+            }
+
+            .schedule-table th,
+            .schedule-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Team Schedule Filter</h1>
+
+        <div class="filters-section">
+            <div class="filter-group">
+                <label class="filter-label">📌 Day of Week (Multiple Select)</label>
+                <div class="filter-options" id="dayFilter">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">⏰ Shift Type (Multiple Select)</label>
+                <div class="filter-options" id="shiftFilter">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">👤 Team Member (Multiple Select)</label>
+                <div class="filter-options" id="nameFilter">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: flex-end;">
+                <button class="reset-btn" onclick="resetFilters()">Clear All Filters</button>
+            </div>
+        </div>
+
+        <div class="results-info" id="resultsInfo"></div>
+
+        <div class="table-wrapper">
+            <table class="schedule-table" id="scheduleTable">
+                <thead id="tableHead">
+                    <tr>
+                        <th>Team Member</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const scheduleData = [
+            { name: "Mudasir Addow", Mon: "1015AM", Tue: "", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "SET", Sun: "SET" },
+            { name: "Ilia Belchevichen", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "", Fri: "415PM", Sat: "OFF", Sun: "1015AM" },
+            { name: "Alejandra Calderon", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "415PM", Fri: "415PM", Sat: "", Sun: "415PM" },
+            { name: "Jaikaran Chugh", Mon: "415PM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "OFF", Sun: "OFF" },
+            { name: "Diletta Di Toma", Mon: "OFF", Tue: "415PM", Wed: "2PM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
+            { name: "Diana Duong", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "SET", Sat: "SET", Sun: "1015AM" },
+            { name: "Daniel Herrera", Mon: "REQ", Tue: "SET", Wed: "OFF", Thu: "415PM", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
+            { name: "David Morillas", Mon: "", Tue: "415PM", Wed: "415PM", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+            { name: "Akriti Kandel", Mon: "", Tue: "415PM", Wed: "OFF", Thu: "430PM EVENT", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+            { name: "Kiana Mercado", Mon: "", Tue: "415PM", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+            { name: "Hasaan Mohsin", Mon: "", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+            { name: "Tibor Lorincz", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+            { name: "Arafa Mutimba", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM 1st cut", Sun: "415PM" },
+            { name: "Alessia Moro", Mon: "OFF", Tue: "OFF", Wed: "11AM", Thu: "415PM", Fri: "415PM", Sat: "2PM", Sun: "1015AM" },
+            { name: "Falguni Patel", Mon: "", Tue: "415PM", Wed: "415PM", Thu: "OFF", Fri: "2PM", Sat: "415PM", Sun: "OFF" },
+            { name: "Jude Salcedo", Mon: "", Tue: "415PM", Wed: "415PM", Thu: "OFF", Fri: "2PM", Sat: "415PM", Sun: "OFF" },
+            { name: "Mac Sealby", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "REQ", Sat: "REQ", Sun: "REQ" },
+            { name: "Tiger Wu", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+            { name: "Esma Sari", Mon: "1015AM", Tue: "2PM", Wed: "1015AM", Thu: "415PM", Fri: "OFF", Sat: "1015AM", Sun: "OFF" },
+            { name: "Sahil Thapa", Mon: "2PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+            { name: "Sabrina Santos", Mon: "", Tue: "415PM 1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "OFF", Sun: "1015AM" },
+            { name: "Julaiti Xijaiti", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "1015AM", Sun: "SET" },
+            { name: "Adrio Fattorini", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "1015AM", Fri: "415PM", Sat: "OFF", Sun: "1015AM" },
+            { name: "Hailey Jang", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "SET", Sat: "415PM", Sun: "415PM" },
+            { name: "Maria Giugliano", Mon: "1015AM", Tue: "OFF", Wed: "11AM", Thu: "1015AM", Fri: "1015AM", Sat: "OFF", Sun: "1015AM" },
+            { name: "Grivia Fernandes", Mon: "SET", Tue: "SET", Wed: "530PM", Thu: "SET", Fri: "530PM", Sat: "SET", Sun: "415PM" },
+            { name: "Joshua Kaanoi", Mon: "1015AM", Tue: "SET", Wed: "415PM", Thu: "11AM", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
+            { name: "Ugurcan Kesman", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "415PM", Fri: "415PM", Sat: "1015AM", Sun: "415PM" },
+            { name: "Franco Dagostino", Mon: "1015AM", Tue: "415PM", Wed: "11AM", Thu: "415PM", Fri: "1015AM", Sat: "OFF", Sun: "2PM" },
+            { name: "Chloe Hand", Mon: "", Tue: "415PM", Wed: "OFF", Thu: "415PM", Fri: "1015AM", Sat: "2PM", Sun: "2PM" }
+        ];
+
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const dayKeys = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const shiftTypes = ["AM", "PM", "Mid-Shift"];
+
+        let filters = {
+            days: [],
+            shifts: [],
+            names: []
+        };
+
+        function classifyShift(shift) {
+            if (!shift || shift === "OFF" || shift === "SET" || shift === "REQ") return null;
+            if (shift.includes("1015AM")) return "AM";
+            if (shift.includes("415PM")) return "PM";
+            return "Mid-Shift";
+        }
+
+        function initializeFilters() {
+            // Day filters
+            const dayContainer = document.getElementById("dayFilter");
+            days.forEach((day, index) => {
+                const btn = document.createElement("button");
+                btn.className = "filter-btn";
+                btn.textContent = day;
+                btn.dataset.value = day;
+                btn.dataset.type = "day";
+                btn.onclick = () => toggleFilter("days", day, btn);
+                dayContainer.appendChild(btn);
+            });
+
+            // Shift filters
+            const shiftContainer = document.getElementById("shiftFilter");
+            shiftTypes.forEach(shift => {
+                const btn = document.createElement("button");
+                btn.className = "filter-btn";
+                btn.textContent = shift;
+                btn.dataset.value = shift;
+                btn.dataset.type = "shift";
+                btn.onclick = () => toggleFilter("shifts", shift, btn);
+                shiftContainer.appendChild(btn);
+            });
+
+            // Name filters
+            const nameContainer = document.getElementById("nameFilter");
+            scheduleData.forEach(person => {
+                const btn = document.createElement("button");
+                btn.className = "filter-btn";
+                btn.textContent = person.name;
+                btn.dataset.value = person.name;
+                btn.dataset.type = "name";
+                btn.onclick = () => toggleFilter("names", person.name, btn);
+                nameContainer.appendChild(btn);
+            });
+
+            renderTable();
+        }
+
+        function toggleFilter(type, value, btn) {
+            const index = filters[type].indexOf(value);
+            if (index > -1) {
+                filters[type].splice(index, 1);
+                btn.classList.remove("active");
+            } else {
+                filters[type].push(value);
+                btn.classList.add("active");
+            }
+            renderTable();
+        }
+
+        function resetFilters() {
+            filters = { days: [], shifts: [], names: [] };
+            document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+            renderTable();
+        }
+
+        function renderTable() {
+            // Determine which columns to show
+            let visibleDays = filters.days.length > 0 ? filters.days : days;
+            let visibleDayIndices = visibleDays.map(day => days.indexOf(day));
+
+            // Build header
+            const thead = document.getElementById("tableHead");
+            let headerHTML = "<tr><th>Team Member</th>";
+            visibleDayIndices.forEach(index => {
+                headerHTML += `<th>${days[index]}</th>`;
+            });
+            headerHTML += "</tr>";
+            thead.innerHTML = headerHTML;
+
+            // Filter data
+            let filteredData = scheduleData.filter(person => {
+                // Filter by name if selected
+                if (filters.names.length > 0 && !filters.names.includes(person.name)) return false;
+
+                // Check if person matches day AND shift criteria (must match ALL selected filters)
+                if (filters.days.length > 0 || filters.shifts.length > 0) {
+                    let matchesAllCriteria = true;
+
+                    if (filters.days.length > 0) {
+                        let matchesDay = false;
+                        filters.days.forEach(day => {
+                            const dayIndex = days.indexOf(day);
+                            const dayKey = dayKeys[dayIndex];
+                            const shift = person[dayKey];
+
+                            if (filters.shifts.length > 0) {
+                                // Must match both day AND one of the shifts
+                                const shiftType = classifyShift(shift);
+                                if (shift && filters.shifts.includes(shiftType)) {
+                                    matchesDay = true;
+                                }
+                            } else {
+                                // Just must have a shift on that day
+                                if (shift && shift !== "OFF") {
+                                    matchesDay = true;
+                                }
+                            }
+                        });
+                        matchesAllCriteria = matchesDay;
+                    } else if (filters.shifts.length > 0) {
+                        // Only shift filter, check if they work any of those shifts on any day
+                        let hasShift = false;
+                        dayKeys.forEach(key => {
+                            const shiftType = classifyShift(person[key]);
+                            if (filters.shifts.includes(shiftType)) {
+                                hasShift = true;
+                            }
+                        });
+                        matchesAllCriteria = hasShift;
+                    }
+
+                    if (!matchesAllCriteria) return false;
+                }
+
+                return true;
+            });
+
+            // Build body
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${visibleDayIndices.length + 1}" class="no-results">No matches found</td></tr>`;
+                document.getElementById("resultsInfo").textContent = "No team members match your filters.";
+                return;
+            }
+
+            filteredData.forEach(person => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td class="name-cell">${person.name}</td>`;
+
+                visibleDayIndices.forEach(dayIndex => {
+                    const dayKey = dayKeys[dayIndex];
+                    const shift = person[dayKey];
+                    let cellHTML = "";
+
+                    if (shift) {
+                        const shiftType = classifyShift(shift);
+                        let badgeClass = "shift-off";
+                        if (shiftType === "AM") badgeClass = "shift-am";
+                        else if (shiftType === "PM") badgeClass = "shift-pm";
+                        else if (shiftType === "Mid-Shift") badgeClass = "shift-mid";
+                        else if (shift === "SET") badgeClass = "shift-set";
+                        else if (shift === "REQ") badgeClass = "shift-req";
+
+                        cellHTML = `<span class="shift-badge ${badgeClass}">${shift}</span>`;
+                    } else {
+                        cellHTML = `<span class="shift-badge shift-off">—</span>`;
+                    }
+
+                    const cell = document.createElement("td");
+                    cell.innerHTML = cellHTML;
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+
+            // Update results info
+            const filterSummary = [];
+            if (filters.days.length > 0) filterSummary.push(`${filters.days.join(", ")}`);
+            if (filters.shifts.length > 0) filterSummary.push(`${filters.shifts.join(", ")} shift${filters.shifts.length > 1 ? "s" : ""}`);
+            if (filters.names.length > 0) filterSummary.push(`${filters.names.join(", ")}`);
+
+            const summaryText = filterSummary.length > 0 
+                ? `Showing ${filteredData.length} result${filteredData.length !== 1 ? "s" : ""} for: ${filterSummary.join(" + ")}`
+                : `Showing all ${filteredData.length} team members`;
+
+            document.getElementById("resultsInfo").textContent = summaryText;
+        }
+
+        initializeFilters();
+    </script>
+</body>
+</html>
