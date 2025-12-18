@@ -1,0 +1,35 @@
+name: Build scheduleData.js from latest CSV
+
+on:
+  push:
+    paths:
+      - "data/*.csv"
+      - "scripts/build_schedule_js.py"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate JS from newest CSV
+        run: python scripts/build_schedule_js.py --data-dir data --out site/scheduleData.js
+
+      - name: Commit generated JS
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add site/scheduleData.js
+          git commit -m "Update scheduleData.js" || echo "No changes"
+          git push
