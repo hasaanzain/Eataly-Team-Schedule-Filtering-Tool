@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -23,13 +23,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Generate JS from newest CSV
-        run: python scripts/build_schedule_js.py --data-dir data --out site/scheduleData.js
+      - name: Generate scheduleData.js
+        run: |
+          python scripts/build_schedule_js.py \
+            --data-dir data \
+            --out scheduleData.js
 
-      - name: Commit generated JS
+      - name: Commit generated file
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add site/scheduleData.js
+          git add scheduleData.js
           git commit -m "Update scheduleData.js" || echo "No changes"
           git push
