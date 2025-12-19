@@ -24,6 +24,56 @@ def normalize_cell(val) -> str:
         return "OFF"
     return s
 
+import re
+
+TIME_24H_RE = re.compile(r"^\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*$")
+TIME_12H_RE = re.compile(r"^\s*(\d{1,2})(?::?(\d{2}))?\s*([AaPp][Mm])\s*$")
+
+def format_shift_time(val: str) -> str:
+    """
+    Convert times into your simple format:
+    14:00 -> 2PM
+    11:00 -> 11AM
+    10:15 -> 1015AM
+    16:15 -> 415PM
+    Also keeps existing 2PM, 11AM, 415PM formats as is.
+    """
+    s = normalize_cell(val)
+
+    up = s.upper().strip()
+    if up in NON_SHIFT_VALUES:
+        return up if up else "OFF"
+
+    # Already in AM PM format like 2PM, 11AM, 4:15PM, 415PM
+    m12 = TIME_12H_RE.match(s)
+    if m12:
+        hour = int(m12.group(1))
+        mins = m12.group(2) or "00"
+        ampm = m12.group(3).upper()
+
+        if mins == "00":
+            return f"{hour}{ampm}"
+        return f"{hour}{mins}{ampm}"
+
+    # 24 hour format like 14:00 or 14:00:00
+    m24 = TIME_24H_RE.match(s)
+    if m24:
+        hour24 = int(m24.group(1))
+        mins = m24.group(2)
+
+        ampm = "AM" if hour24 < 12 else "PM"
+        hour12 = hour24 % 12
+        if hour12 == 0:
+            hour12 = 12
+
+        if mins == "00":
+            return f"{hour12}{ampm}"
+        return f"{hour12}{mins}{ampm}"
+
+    # Anything else, leave untouched (covers notes, weird tokens, etc)
+    return s.strip()
+
+
 
 def clean_df_from_eataly_csv(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
@@ -79,8 +129,9 @@ def df_to_schedule_data(df: pd.DataFrame) -> list[dict]:
         person = {"name": name}
 
         for day, key in zip(DAYS, DAY_KEYS):
-            am = normalize_cell(row.get(f"{day}_AM", "OFF"))
-            pm = normalize_cell(row.get(f"{day}_PM", "OFF"))
+            am = format_shift_time(row.get(f"{day}_AM", "OFF"))
+            pm = format_shift_time(row.get(f"{day}_PM", "OFF"))
+
 
             shifts = []
             if am.upper() not in NON_SHIFT_VALUES:
