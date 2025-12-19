@@ -24,7 +24,7 @@ export const scheduleData = [
     "name": "Alejandra Calderon",
     "Mon": "SET",
     "Tue": "SET",
-    "Wed": "11:00",
+    "Wed": "11AM",
     "Thu": "415PM",
     "Fri": "415PM",
     "Sat": "415PM",
@@ -44,7 +44,7 @@ export const scheduleData = [
     "name": "Diletta Di Toma",
     "Mon": "OFF",
     "Tue": "415PM",
-    "Wed": "14:00",
+    "Wed": "2PM",
     "Thu": "1015AM",
     "Fri": "1015AM",
     "Sat": "1015AM",
@@ -141,12 +141,12 @@ export const scheduleData = [
     "Mon": "OFF",
     "Tue": "OFF",
     "Wed": [
-      "11:00",
+      "11AM",
       "415PM"
     ],
     "Thu": "415PM",
     "Fri": "415PM",
-    "Sat": "14:00",
+    "Sat": "2PM",
     "Sun": "1015AM"
   },
   {
@@ -155,7 +155,7 @@ export const scheduleData = [
     "Tue": "415PM",
     "Wed": "OFF",
     "Thu": "415PM",
-    "Fri": "14:00",
+    "Fri": "2PM",
     "Sat": "415PM",
     "Sun": "OFF"
   },
@@ -164,7 +164,7 @@ export const scheduleData = [
     "Mon": "415PM",
     "Tue": "415PM",
     "Wed": "OFF",
-    "Thu": "14:00",
+    "Thu": "2PM",
     "Fri": "415PM",
     "Sat": "415PM",
     "Sun": "OFF"
@@ -192,7 +192,7 @@ export const scheduleData = [
   {
     "name": "Esma Sari",
     "Mon": "1015AM",
-    "Tue": "14:00",
+    "Tue": "2PM",
     "Wed": "1015AM",
     "Thu": "415PM",
     "Fri": "OFF",
@@ -201,7 +201,7 @@ export const scheduleData = [
   },
   {
     "name": "Sahil Thapa",
-    "Mon": "14:00",
+    "Mon": "2PM",
     "Tue": "415PM",
     "Wed": "OFF",
     "Thu": "OFF",
@@ -254,7 +254,7 @@ export const scheduleData = [
     "Mon": "1015AM",
     "Tue": "OFF",
     "Wed": [
-      "11:00",
+      "11AM",
       "415PM"
     ],
     "Thu": "1015AM",
@@ -267,7 +267,7 @@ export const scheduleData = [
     "Mon": "OFF",
     "Tue": "530PM",
     "Wed": [
-      "11:00",
+      "11AM",
       "530PM"
     ],
     "Thu": "530PM",
@@ -280,7 +280,7 @@ export const scheduleData = [
     "Mon": "1015AM",
     "Tue": "415PM",
     "Wed": [
-      "11:00",
+      "11AM",
       "415PM"
     ],
     "Thu": "415PM",
@@ -293,7 +293,7 @@ export const scheduleData = [
     "Mon": "SET",
     "Tue": "SET",
     "Wed": [
-      "11:00",
+      "11AM",
       "415PM"
     ],
     "Thu": "415PM",
@@ -306,25 +306,25 @@ export const scheduleData = [
     "Mon": "1015AM",
     "Tue": "415PM",
     "Wed": [
-      "11:00",
+      "11AM",
       "415PM"
     ],
     "Thu": "OFF",
     "Fri": "1015AM",
     "Sat": "OFF",
-    "Sun": "14:00"
+    "Sun": "2PM"
   },
   {
     "name": "Chloe Hand",
     "Mon": "415PM",
     "Tue": "OFF",
     "Wed": [
-      "11:00",
+      "11AM",
       "415PM"
     ],
     "Thu": "OFF",
     "Fri": "1015AM",
-    "Sat": "14:00",
-    "Sun": "14:00"
+    "Sat": "2PM",
+    "Sun": "2PM"
   }
 ];
