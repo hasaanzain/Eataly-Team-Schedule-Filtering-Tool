@@ -111,7 +111,7 @@ export const scheduleData = [
     "Thu": "OFF",
     "Fri": "415PM",
     "Sat": "415PM",
-    "Sun": "415PM"
+    "Sun": "1015AM"
   },
   {
     "name": "Tibor Lorincz",
