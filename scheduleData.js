@@ -1,4 +1,4 @@
-const scheduleData = [
+export const scheduleData = [
   {
     "name": "Mudasir Addow",
     "Mon": "1015AM",
