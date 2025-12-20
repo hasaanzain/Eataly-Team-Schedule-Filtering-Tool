@@ -156,6 +156,6 @@ import json
 output_path = "scheduleData.js"
 
 with open(output_path, "w", encoding="utf-8") as f:
-    f.write("export const scheduleData = ")
+    f.write("const scheduleData = ")
     json.dump(scheduleData, f, indent=2)
     f.write(";\n")
