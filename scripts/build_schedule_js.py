@@ -23,7 +23,7 @@ for csv in csv_files:
 import pandas as pd
 
 #load in from CSV
-df = pd.read_csv('Book1.csv')
+df = pd.read_csv(latest_csv)
 
 
 #drop all irrelevant rows at the top
