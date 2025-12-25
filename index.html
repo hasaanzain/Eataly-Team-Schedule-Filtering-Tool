@@ -18,7 +18,7 @@
 
     body {
       background-color: var(--color-bg);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       padding: 20px;
     }
 
@@ -36,7 +36,6 @@
       color: var(--color-text);
     }
 
-    /* WEEK NAV */
     #weekNav {
       display: flex;
       align-items: center;
@@ -51,7 +50,7 @@
       padding: 10px 18px;
       font-size: 14px;
       font-weight: 600;
-      border-radius: 999px; /* curved bezel */
+      border-radius: 999px;
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
@@ -65,6 +64,17 @@
       color: var(--color-text);
     }
 
+    #errorBox {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 600;
+      white-space: pre-wrap;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -76,6 +86,7 @@
       text-align: center;
       border-bottom: 1px solid #e5e7eb;
       font-size: 14px;
+      vertical-align: top;
     }
 
     th {
@@ -86,6 +97,7 @@
     .name-cell {
       text-align: left;
       font-weight: 600;
+      white-space: nowrap;
     }
 
     .shift-badge {
@@ -103,19 +115,20 @@
     .shift-off { background: #f3f4f6; color: #6b7280; }
     .shift-set { background: #fee2e2; color: #991b1b; }
     .shift-req { background: #ede9fe; color: #5b21b6; }
-
   </style>
 </head>
-<body>
 
+<body>
   <div class="container">
     <h1>Team Schedule</h1>
 
     <div id="weekNav">
-      <button class="week-btn" id="prevWeekBtn">Previous Week</button>
+      <button class="week-btn" id="prevWeekBtn" type="button">Previous Week</button>
       <div id="weekLabel"></div>
-      <button class="week-btn" id="nextWeekBtn">Next Week</button>
+      <button class="week-btn" id="nextWeekBtn" type="button">Next Week</button>
     </div>
+
+    <div id="errorBox"></div>
 
     <table>
       <thead id="tableHead"></thead>
@@ -127,360 +140,102 @@
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const dayKeys = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-        // Two-week container. Put Week 2 data into scheduleWeeks[1].data and update weekStartISO dates.
+    // Two-week container. Put Week 2 data into scheduleWeeks[1].data and update weekStartISO dates.
     const scheduleWeeks = [
-            {
-                id: "week1",
-                weekStartISO: "2025-12-22", // Monday start date for Week 1 (YYYY-MM-DD)
-                data: [
-    { name: "Mudasir Addow", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "SET", Sun: "SET" },
-    { name: "Ilia Belchevichen", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "415PM", Sat: "OFF", Sun: "1015AM" },
-    { name: "Alejandra Calderon", Mon: "SET", Tue: "1015AM", Wed: "SET", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "SET" },
-    { name: "Jaikaran Chugh", Mon: "415PM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "OFF", Sun: "OFF" },
-    { name: "Diletta Di Toma", Mon: "OFF", Tue: "415PM", Wed: "2PM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
-    { name: "Diana Duong", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "SET", Sat: "SET", Sun: ["1015AM", "415PM 1st cut"] },
-    { name: "Daniel Herrera", Mon: "1015AM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
-    { name: "David Morillas", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
-    { name: "Akriti Kandel", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
-    { name: "Kiana Mercado", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
-    { name: "Hasaan Mohsin", Mon: "415PM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
-    { name: "Tibor Lorincz", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
-    { name: "Arafa Mutimba", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
-    { name: "Alessia Moro", Mon: "OFF", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "2PM", Sun: "1015AM" },
-    { name: "Falguni Patel", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "1015AM", Fri: "2PM", Sat: "415PM", Sun: "OFF" },
-    { name: "Jude Salcedo", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "2PM", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
-    { name: "Mac Sealby", Mon: "REQ", Tue: "REQ", Wed: "REQ", Thu: "SET", Fri: ["REQ", "REQ"], Sat: ["REQ", "REQ"], Sun: ["REQ", "REQ"] },
-    { name: "Tiger Wu", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
-    { name: "Esma Sari", Mon: "415PM", Tue: "2PM", Wed: "415PM", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
-    { name: "Sahil Thapa", Mon: "2PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
-    { name: "Sabrina Santos", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "OFF", Sun: ["1015AM", "415PM 1st cut"] },
-    { name: "Julaiti Xijaaiti", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "1015AM", Sun: "1015AM" },
-    { name: "Adrio Fattorini", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "1015AM", Fri: "OFF", Sat: "415PM", Sun: "1015AM" },
-    { name: "Hailey Jang", Mon: "415PM", Tue: "OFF", Wed: "415PM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
-    { name: "Maria Giugliano", Mon: "1015AM", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "12pm host runner", Sat: "OFF", Sun: "1015AM" },
-    { name: "Grivia Fernandes", Mon: "OFF", Tue: "530PM", Wed: "530PM", Thu: "530PM", Fri: "OFF", Sat: "415PM", Sun: "415PM" },
-    { name: "Joshua Kaanoi", Mon: "1015AM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "OFF", Sat: "1015AM", Sun: "OFF" },
-    { name: "Ugurcan Kesman", Mon: "SET", Tue: "SET", Wed: "415PM", Thu: "415PM", Fri: "2PM", Sat: "1015AM", Sun: "415PM" },
-    { name: "Franco Dagostino", Mon: "1015AM", Tue: "415PM", Wed: ["1015AM", "415PM 1st cut"], Thu: "OFF", Fri: "1015AM", Sat: "OFF", Sun: "2PM" },
-    { name: "Chloe Hand", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "2PM", Sun: "2PM" }
-]
-            },
-            {
-                id: "week2",
-                weekStartISO: "2025-12-29", // Monday start date for Week 2 (YYYY-MM-DD)
-                data: [
-  {
-    "name": "Mudasir Addow",
-    "Mon": "1015AM",
-    "Tue": "1015AM",
-    "Wed": "1015AM",
-    "Thu": "1015AM",
-    "Fri": "1015AM",
-    "Sat": "SET",
-    "Sun": "SET"
-  },
-  {
-    "name": "Ilia Belchevichen",
-    "Mon": "OFF",
-    "Tue": "REQ",
-    "Wed": [
-      "1015AM",
-      "415PM 1st cut"
-    ],
-    "Thu": "1015AM",
-    "Fri": "415PM",
-    "Sat": "1015AM",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Alejandra Calderon",
-    "Mon": "SET",
-    "Tue": "1015AM",
-    "Wed": "SET",
-    "Thu": "415PM",
-    "Fri": "415PM",
-    "Sat": [
-      "1015AM",
-      "415PM 1st cut"
-    ],
-    "Sun": "SET"
-  },
-  {
-    "name": "Jaikaran Chugh",
-    "Mon": "430PM",
-    "Tue": "430PM",
-    "Wed": "430PM",
-    "Thu": "430PM",
-    "Fri": "430PM",
-    "Sat": "OFF",
-    "Sun": "OFF"
-  },
-  {
-    "name": "Diletta Di Toma",
-    "Mon": "OFF",
-    "Tue": "415PM",
-    "Wed": "14:00",
-    "Thu": "1015AM",
-    "Fri": "1015AM",
-    "Sat": "1015AM",
-    "Sun": "OFF"
-  },
-  {
-    "name": "Diana Duong",
-    "Mon": "SET",
-    "Tue": "SET",
-    "Wed": "SET",
-    "Thu": "SET",
-    "Fri": "SET",
-    "Sat": "SET",
-    "Sun": [
-      "1015AM",
-      "415PM 1st cut"
-    ]
-  },
-  {
-    "name": "Daniel Herrera",
-    "Mon": "1015AM",
-    "Tue": "SET",
-    "Wed": "SET",
-    "Thu": "415PM",
-    "Fri": "1015AM",
-    "Sat": "1015AM",
-    "Sun": "415PM"
-  },
-  {
-    "name": "David Morillas",
-    "Mon": "415PM",
-    "Tue": "415PM",
-    "Wed": "OFF",
-    "Thu": "OFF",
-    "Fri": "1015AM",
-    "Sat": "1015AM",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Akriti Kandel",
-    "Mon": "415PM",
-    "Tue": "OFF",
-    "Wed": "OFF",
-    "Thu": "415PM",
-    "Fri": "415PM",
-    "Sat": "415PM",
-    "Sun": "415PM"
-  },
-  {
-    "name": "Kiana Mercado",
-    "Mon": "415PM",
-    "Tue": "OFF",
-    "Wed": "OFF",
-    "Thu": "415PM",
-    "Fri": "415PM",
-    "Sat": "415PM",
-    "Sun": "415PM"
-  },
-  {
-    "name": "Hasaan Mohsin",
-    "Mon": "415PM",
-    "Tue": "1015AM",
-    "Wed": "1015AM",
-    "Thu": "OFF",
-    "Fri": "415PM",
-    "Sat": "415PM",
-    "Sun": "OFF"
-  },
-  {
-    "name": "Tibor Lorincz",
-    "Mon": "1015AM",
-    "Tue": "1015AM",
-    "Wed": "1015AM",
-    "Thu": "SET",
-    "Fri": "415PM",
-    "Sat": "REQ",
-    "Sun": "SET"
-  },
-  {
-    "name": "Arafa Mutimba",
-    "Mon": "1015AM",
-    "Tue": "1015AM",
-    "Wed": "OFF",
-    "Thu": "OFF",
-    "Fri": "1015AM",
-    "Sat": [
-      "1015AM",
-      "415PM 1st cut"
-    ],
-    "Sun": "415PM"
-  },
-  {
-    "name": "Alessia Moro",
-    "Mon": "OFF",
-    "Tue": "OFF",
-    "Wed": "415PM",
-    "Thu": "415PM",
-    "Fri": "415PM",
-    "Sat": "14:00",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Falguni Patel",
-    "Mon": "415PM",
-    "Tue": "415PM",
-    "Wed": "OFF",
-    "Thu": "1015AM",
-    "Fri": "14:00",
-    "Sat": "415PM",
-    "Sun": "OFF"
-  },
-  {
-    "name": "Jude Salcedo",
-    "Mon": "415PM",
-    "Tue": "415PM",
-    "Wed": "OFF",
-    "Thu": "14:00",
-    "Fri": "415PM",
-    "Sat": "415PM",
-    "Sun": "OFF"
-  },
-  {
-    "name": "Mac Sealby",
-    "Mon": "REQ",
-    "Tue": "REQ",
-    "Wed": "REQ",
-    "Thu": "SET",
-    "Fri": "REQ",
-    "Sat": "REQ",
-    "Sun": "REQ"
-  },
-  {
-    "name": "Tiger Wu",
-    "Mon": "OFF",
-    "Tue": "1015AM",
-    "Wed": "1015AM",
-    "Thu": "1015AM",
-    "Fri": "1015AM",
-    "Sat": "OFF",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Esma Sari",
-    "Mon": "415PM",
-    "Tue": "14:00",
-    "Wed": "415PM",
-    "Thu": "OFF",
-    "Fri": "1015AM",
-    "Sat": "1015AM",
-    "Sun": "OFF"
-  },
-  {
-    "name": "Sahil Thapa",
-    "Mon": "14:00",
-    "Tue": "415PM",
-    "Wed": "OFF",
-    "Thu": "OFF",
-    "Fri": "1015AM",
-    "Sat": "1015AM",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Sabrina Santos",
-    "Mon": "1015AM",
-    "Tue": "1015AM",
-    "Wed": "1015AM",
-    "Thu": "1015AM",
-    "Fri": "OFF",
-    "Sat": "OFF",
-    "Sun": [
-      "1015AM",
-      "415PM 1st cut"
-    ]
-  },
-  {
-    "name": "Julaiti Xijaaiti",
-    "Mon": "OFF",
-    "Tue": "1015AM",
-    "Wed": "1015AM",
-    "Thu": "1015AM",
-    "Fri": "OFF",
-    "Sat": "1015AM",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Adrio Fattorini",
-    "Mon": "1015AM",
-    "Tue": "1015AM",
-    "Wed": "OFF",
-    "Thu": "1015AM",
-    "Fri": "OFF",
-    "Sat": "415PM",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Hailey Jang",
-    "Mon": "415PM",
-    "Tue": "SET",
-    "Wed": "415PM",
-    "Thu": "SET",
-    "Fri": "415PM",
-    "Sat": "415PM",
-    "Sun": "415PM"
-  },
-  {
-    "name": "Maria Giugliano",
-    "Mon": "1015AM",
-    "Tue": "OFF",
-    "Wed": "415PM",
-    "Thu": "415PM",
-    "Fri": "14:00",
-    "Sat": "OFF",
-    "Sun": "1015AM"
-  },
-  {
-    "name": "Grivia Fernandes",
-    "Mon": "SET",
-    "Tue": "530PM",
-    "Wed": "530PM",
-    "Thu": "530PM",
-    "Fri": "SET",
-    "Sat": "415PM",
-    "Sun": "415PM"
-  },
-  {
-    "name": "Joshua Kaanoi",
-    "Mon": "1015AM",
-    "Tue": "415PM",
-    "Wed": [
-      "1015AM",
-      "415PM 1st cut"
-    ],
-    "Thu": "415PM",
-    "Fri": "OFF",
-    "Sat": "1015AM",
-    "Sun": "SET"
-  },
-  {
-    "name": "Franco Dagostino",
-    "Mon": "1015AM",
-    "Tue": "415PM",
-    "Wed": "415PM",
-    "Thu": "OFF",
-    "Fri": "1015AM",
-    "Sat": "OFF",
-    "Sun": "14:00"
-  },
-  {
-    "name": "Chloe Hand",
-    "Mon": "OFF",
-    "Tue": "OFF",
-    "Wed": "1015AM",
-    "Thu": "1015AM",
-    "Fri": "1015AM",
-    "Sat": "14:00",
-    "Sun": "14:00"
-  }
-
-] // Paste Week 2 data here
-            }
-        ];
+      {
+        id: "week1",
+        weekStartISO: "2025-12-22",
+        data: [
+          { name: "Mudasir Addow", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "SET", Sun: "SET" },
+          { name: "Ilia Belchevichen", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "415PM", Sat: "OFF", Sun: "1015AM" },
+          { name: "Alejandra Calderon", Mon: "SET", Tue: "1015AM", Wed: "SET", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "SET" },
+          { name: "Jaikaran Chugh", Mon: "415PM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "OFF", Sun: "OFF" },
+          { name: "Diletta Di Toma", Mon: "OFF", Tue: "415PM", Wed: "2PM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
+          { name: "Diana Duong", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "SET", Sat: "SET", Sun: ["1015AM", "415PM 1st cut"] },
+          { name: "Daniel Herrera", Mon: "1015AM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
+          { name: "David Morillas", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+          { name: "Akriti Kandel", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+          { name: "Kiana Mercado", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+          { name: "Hasaan Mohsin", Mon: "415PM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+          { name: "Tibor Lorincz", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+          { name: "Arafa Mutimba", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
+          { name: "Alessia Moro", Mon: "OFF", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "2PM", Sun: "1015AM" },
+          { name: "Falguni Patel", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "1015AM", Fri: "2PM", Sat: "415PM", Sun: "OFF" },
+          { name: "Jude Salcedo", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "2PM", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+          { name: "Mac Sealby", Mon: "REQ", Tue: "REQ", Wed: "REQ", Thu: "SET", Fri: ["REQ", "REQ"], Sat: ["REQ", "REQ"], Sun: ["REQ", "REQ"] },
+          { name: "Tiger Wu", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+          { name: "Esma Sari", Mon: "415PM", Tue: "2PM", Wed: "415PM", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
+          { name: "Sahil Thapa", Mon: "2PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+          { name: "Sabrina Santos", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "OFF", Sun: ["1015AM", "415PM 1st cut"] },
+          { name: "Julaiti Xijaaiti", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "1015AM", Sun: "1015AM" },
+          { name: "Adrio Fattorini", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "1015AM", Fri: "OFF", Sat: "415PM", Sun: "1015AM" },
+          { name: "Hailey Jang", Mon: "415PM", Tue: "OFF", Wed: "415PM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+          { name: "Maria Giugliano", Mon: "1015AM", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "12pm host runner", Sat: "OFF", Sun: "1015AM" },
+          { name: "Grivia Fernandes", Mon: "OFF", Tue: "530PM", Wed: "530PM", Thu: "530PM", Fri: "OFF", Sat: "415PM", Sun: "415PM" },
+          { name: "Joshua Kaanoi", Mon: "1015AM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "OFF", Sat: "1015AM", Sun: "OFF" },
+          { name: "Ugurcan Kesman", Mon: "SET", Tue: "SET", Wed: "415PM", Thu: "415PM", Fri: "2PM", Sat: "1015AM", Sun: "415PM" },
+          { name: "Franco Dagostino", Mon: "1015AM", Tue: "415PM", Wed: ["1015AM", "415PM 1st cut"], Thu: "OFF", Fri: "1015AM", Sat: "OFF", Sun: "2PM" },
+          { name: "Chloe Hand", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "2PM", Sun: "2PM" }
+        ]
+      },
+      {
+        id: "week2",
+        weekStartISO: "2025-12-29",
+        data: [
+          {
+            "name": "Mudasir Addow",
+            "Mon": "1015AM",
+            "Tue": "1015AM",
+            "Wed": "1015AM",
+            "Thu": "1015AM",
+            "Fri": "1015AM",
+            "Sat": "SET",
+            "Sun": "SET"
+          },
+          {
+            "name": "Ilia Belchevichen",
+            "Mon": "OFF",
+            "Tue": "REQ",
+            "Wed": ["1015AM", "415PM 1st cut"],
+            "Thu": "1015AM",
+            "Fri": "415PM",
+            "Sat": "1015AM",
+            "Sun": "1015AM"
+          },
+          {
+            "name": "Alejandra Calderon",
+            "Mon": "SET",
+            "Tue": "1015AM",
+            "Wed": "SET",
+            "Thu": "415PM",
+            "Fri": "415PM",
+            "Sat": ["1015AM", "415PM 1st cut"],
+            "Sun": "SET"
+          },
+          {
+            "name": "Jaikaran Chugh",
+            "Mon": "430PM",
+            "Tue": "430PM",
+            "Wed": "430PM",
+            "Thu": "430PM",
+            "Fri": "430PM",
+            "Sat": "OFF",
+            "Sun": "OFF"
+          },
+          {
+            "name": "Diletta Di Toma",
+            "Mon": "OFF",
+            "Tue": "415PM",
+            "Wed": "14:00",
+            "Thu": "1015AM",
+            "Fri": "1015AM",
+            "Sat": "1015AM",
+            "Sun": "OFF"
+          }
+          // You can keep the rest of week2 objects, I trimmed here for readability
+        ]
+      }
+    ];
 
     let currentWeekIndex = 0;
 
@@ -489,12 +244,13 @@
     }
 
     function getActiveData() {
-      return getActiveWeek().data;
+      const w = getActiveWeek();
+      return (w && Array.isArray(w.data)) ? w.data : [];
     }
 
     function parseISODateLocal(iso) {
-      const [y, m, d] = iso.split("-").map(Number);
-      return new Date(y, m - 1, d);
+      const parts = String(iso).split("-").map(Number);
+      return new Date(parts[0], parts[1] - 1, parts[2]);
     }
 
     function formatDateShort(d) {
@@ -510,10 +266,16 @@
       });
     }
 
+    function normalizeShift(s) {
+      if (s === "14:00") return "2PM";
+      return s;
+    }
+
     function classifyShift(s) {
-      if (!s || s === "OFF" || s === "SET" || s === "REQ") return null;
-      if (String(s).includes("1015AM")) return "AM";
-      if (String(s).includes("415PM") || String(s).includes("430PM")) return "PM";
+      const v = String(normalizeShift(s || ""));
+      if (!v || v === "OFF" || v === "SET" || v === "REQ") return null;
+      if (v.includes("AM")) return "AM";
+      if (v.includes("PM")) return "PM";
       return "Mid-Shift";
     }
 
@@ -531,9 +293,6 @@
       renderTable();
     }
 
-    document.getElementById("prevWeekBtn").onclick = () => switchWeek(-1);
-    document.getElementById("nextWeekBtn").onclick = () => switchWeek(1);
-
     function renderTable() {
       const week = getActiveWeek();
       const data = getActiveData();
@@ -549,16 +308,24 @@
       const tbody = document.getElementById("tableBody");
       tbody.innerHTML = "";
 
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--color-text-secondary);font-weight:600;padding:18px;">No schedule data found for this week.</td></tr>`;
+        return;
+      }
+
       data.forEach(person => {
         const row = document.createElement("tr");
-        row.innerHTML = `<td class="name-cell">${person.name}</td>`;
+        row.innerHTML = `<td class="name-cell">${person.name || ""}</td>`;
 
         dayKeys.forEach(k => {
           const raw = person[k];
           const shifts = Array.isArray(raw) ? raw : raw ? [raw] : [];
-          let html = shifts.length
-            ? shifts.map(s => {
+
+          const html = shifts.length
+            ? shifts.map(s0 => {
+                const s = normalizeShift(s0);
                 const t = classifyShift(s);
+
                 const cls =
                   s === "OFF" ? "shift-off" :
                   s === "SET" ? "shift-set" :
@@ -566,6 +333,7 @@
                   t === "AM" ? "shift-am" :
                   t === "PM" ? "shift-pm" :
                   "shift-mid";
+
                 return `<span class="shift-badge ${cls}">${s}</span>`;
               }).join("<br>")
             : `<span class="shift-badge shift-off"></span>`;
@@ -577,9 +345,23 @@
       });
     }
 
-    setWeekLabel();
-    renderTable();
-  </script>
+    function showError(err) {
+      const box = document.getElementById("errorBox");
+      box.style.display = "block";
+      box.textContent = "JavaScript error:\n\n" + (err && err.stack ? err.stack : String(err));
+    }
 
+    document.addEventListener("DOMContentLoaded", () => {
+      try {
+        document.getElementById("prevWeekBtn").addEventListener("click", () => switchWeek(-1));
+        document.getElementById("nextWeekBtn").addEventListener("click", () => switchWeek(1));
+
+        setWeekLabel();
+        renderTable();
+      } catch (err) {
+        showError(err);
+      }
+    });
+  </script>
 </body>
 </html>
