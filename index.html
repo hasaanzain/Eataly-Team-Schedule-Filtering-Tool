@@ -238,6 +238,30 @@
             overflow-x: auto;
         }
 
+        .week-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .week-label {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .week-hint {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .date-subheader {
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            font-size: 12px;
+        }
+
         @media (max-width: 768px) {
             .filters-section {
                 grid-template-columns: 1fr;
@@ -263,12 +287,12 @@
     <div class="container">
         <h1>EEC Table Support Team Schedule Filter</h1>
 
-        <div id="weekNav" style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+        <div class="week-nav" id="weekNav">
             <button class="reset-btn" id="prevWeekBtn">Prev Week</button>
-              <div id="weekLabel" style="font-weight:600; color: var(--color-text);"></div>
-             <button class="reset-btn" id="nextWeekBtn">Next Week</button>
-          </div>
-
+            <div class="week-label" id="weekLabel"></div>
+            <button class="reset-btn" id="nextWeekBtn">Next Week</button>
+            <div class="week-hint">Tip: swipe left or right to change week</div>
+        </div>
 
         <div class="filters-section">
             <div class="filter-group">
@@ -314,49 +338,48 @@
     </div>
 
     <script>
+        // Two-week container. Put Week 2 data into scheduleWeeks[1].data and update weekStartISO dates.
         const scheduleWeeks = [
-          {
-          id: "week1",
-          weekStartISO: "2025-12-22", // Monday start date for Week 1 (YYYY-MM-DD)
-          data: [
-            { name: "Mudasir Addow", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "SET", Sun: "SET" },
-            { name: "Ilia Belchevichen", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "415PM", Sat: "OFF", Sun: "1015AM" },
-            { name: "Alejandra Calderon", Mon: "SET", Tue: "1015AM", Wed: "SET", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "SET" },
-            { name: "Jaikaran Chugh", Mon: "415PM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "OFF", Sun: "OFF" },
-            { name: "Diletta Di Toma", Mon: "OFF", Tue: "415PM", Wed: "2PM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
-            { name: "Diana Duong", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "SET", Sat: "SET", Sun: ["1015AM", "415PM 1st cut"] },
-            { name: "Daniel Herrera", Mon: "1015AM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
-            { name: "David Morillas", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
-            { name: "Akriti Kandel", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
-            { name: "Kiana Mercado", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
-            { name: "Hasaan Mohsin", Mon: "415PM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
-            { name: "Tibor Lorincz", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
-            { name: "Arafa Mutimba", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
-            { name: "Alessia Moro", Mon: "OFF", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "2PM", Sun: "1015AM" },
-            { name: "Falguni Patel", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "1015AM", Fri: "2PM", Sat: "415PM", Sun: "OFF" },
-            { name: "Jude Salcedo", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "2PM", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
-            { name: "Mac Sealby", Mon: "REQ", Tue: "REQ", Wed: "REQ", Thu: "SET", Fri: ["REQ", "REQ"], Sat: ["REQ", "REQ"], Sun: ["REQ", "REQ"] },
-            { name: "Tiger Wu", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
-            { name: "Esma Sari", Mon: "415PM", Tue: "2PM", Wed: "415PM", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
-            { name: "Sahil Thapa", Mon: "2PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
-            { name: "Sabrina Santos", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "OFF", Sun: ["1015AM", "415PM 1st cut"] },
-            { name: "Julaiti Xijaaiti", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "1015AM", Sun: "1015AM" },
-            { name: "Adrio Fattorini", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "1015AM", Fri: "OFF", Sat: "415PM", Sun: "1015AM" },
-            { name: "Hailey Jang", Mon: "415PM", Tue: "OFF", Wed: "415PM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
-            { name: "Maria Giugliano", Mon: "1015AM", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "12pm host runner", Sat: "OFF", Sun: "1015AM" },
-            { name: "Grivia Fernandes", Mon: "OFF", Tue: "530PM", Wed: "530PM", Thu: "530PM", Fri: "OFF", Sat: "415PM", Sun: "415PM" },
-            { name: "Joshua Kaanoi", Mon: "1015AM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "OFF", Sat: "1015AM", Sun: "OFF" },
-            { name: "Ugurcan Kesman", Mon: "SET", Tue: "SET", Wed: "415PM", Thu: "415PM", Fri: "2PM", Sat: "1015AM", Sun: "415PM" },
-            { name: "Franco Dagostino", Mon: "1015AM", Tue: "415PM", Wed: ["1015AM", "415PM 1st cut"], Thu: "OFF", Fri: "1015AM", Sat: "OFF", Sun: "2PM" },
-            { name: "Chloe Hand", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "2PM", Sun: "2PM" }
-      ],
-    },
-
-    {
-      id: "week2",
-      weekStartISO: "2025-12-29", // Monday start date for Week 2
-      data: [
-        export const scheduleData = [
+            {
+                id: "week1",
+                weekStartISO: "2025-12-22", // Monday start date for Week 1 (YYYY-MM-DD)
+                data: [
+    { name: "Mudasir Addow", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "SET", Sun: "SET" },
+    { name: "Ilia Belchevichen", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "415PM", Sat: "OFF", Sun: "1015AM" },
+    { name: "Alejandra Calderon", Mon: "SET", Tue: "1015AM", Wed: "SET", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "SET" },
+    { name: "Jaikaran Chugh", Mon: "415PM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "OFF", Sun: "OFF" },
+    { name: "Diletta Di Toma", Mon: "OFF", Tue: "415PM", Wed: "2PM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
+    { name: "Diana Duong", Mon: "SET", Tue: "SET", Wed: "SET", Thu: "SET", Fri: "SET", Sat: "SET", Sun: ["1015AM", "415PM 1st cut"] },
+    { name: "Daniel Herrera", Mon: "1015AM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
+    { name: "David Morillas", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+    { name: "Akriti Kandel", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+    { name: "Kiana Mercado", Mon: "415PM", Tue: "OFF", Wed: "OFF", Thu: "415PM", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+    { name: "Hasaan Mohsin", Mon: "415PM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+    { name: "Tibor Lorincz", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+    { name: "Arafa Mutimba", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "415PM" },
+    { name: "Alessia Moro", Mon: "OFF", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "415PM", Sat: "2PM", Sun: "1015AM" },
+    { name: "Falguni Patel", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "1015AM", Fri: "2PM", Sat: "415PM", Sun: "OFF" },
+    { name: "Jude Salcedo", Mon: "415PM", Tue: "415PM", Wed: "OFF", Thu: "2PM", Fri: "415PM", Sat: "415PM", Sun: "OFF" },
+    { name: "Mac Sealby", Mon: "REQ", Tue: "REQ", Wed: "REQ", Thu: "SET", Fri: ["REQ", "REQ"], Sat: ["REQ", "REQ"], Sun: ["REQ", "REQ"] },
+    { name: "Tiger Wu", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+    { name: "Esma Sari", Mon: "415PM", Tue: "2PM", Wed: "415PM", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "OFF" },
+    { name: "Sahil Thapa", Mon: "2PM", Tue: "415PM", Wed: "OFF", Thu: "OFF", Fri: "1015AM", Sat: "1015AM", Sun: "1015AM" },
+    { name: "Sabrina Santos", Mon: "1015AM", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "OFF", Sun: ["1015AM", "415PM 1st cut"] },
+    { name: "Julaiti Xijaaiti", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "OFF", Sat: "1015AM", Sun: "1015AM" },
+    { name: "Adrio Fattorini", Mon: "1015AM", Tue: "1015AM", Wed: "OFF", Thu: "1015AM", Fri: "OFF", Sat: "415PM", Sun: "1015AM" },
+    { name: "Hailey Jang", Mon: "415PM", Tue: "OFF", Wed: "415PM", Thu: "OFF", Fri: "415PM", Sat: "415PM", Sun: "415PM" },
+    { name: "Maria Giugliano", Mon: "1015AM", Tue: "OFF", Wed: "415PM", Thu: "415PM", Fri: "12pm host runner", Sat: "OFF", Sun: "1015AM" },
+    { name: "Grivia Fernandes", Mon: "OFF", Tue: "530PM", Wed: "530PM", Thu: "530PM", Fri: "OFF", Sat: "415PM", Sun: "415PM" },
+    { name: "Joshua Kaanoi", Mon: "1015AM", Tue: "415PM", Wed: "415PM", Thu: "415PM", Fri: "OFF", Sat: "1015AM", Sun: "OFF" },
+    { name: "Ugurcan Kesman", Mon: "SET", Tue: "SET", Wed: "415PM", Thu: "415PM", Fri: "2PM", Sat: "1015AM", Sun: "415PM" },
+    { name: "Franco Dagostino", Mon: "1015AM", Tue: "415PM", Wed: ["1015AM", "415PM 1st cut"], Thu: "OFF", Fri: "1015AM", Sat: "OFF", Sun: "2PM" },
+    { name: "Chloe Hand", Mon: "OFF", Tue: "OFF", Wed: "1015AM", Thu: "1015AM", Fri: "1015AM", Sat: "2PM", Sun: "2PM" }
+]
+            },
+            {
+                id: "week2",
+                weekStartISO: "2025-12-29", // Monday start date for Week 2 (YYYY-MM-DD)
+                data: [
   {
     "name": "Mudasir Addow",
     "Mon": "1015AM",
@@ -666,25 +689,29 @@
     "Sun": "14:00"
   }
 
-        // Paste week 2 schedule objects here (same shape as week 1)
-        // Example:
-        // { name: "Mudasir Addow", Mon: "OFF", Tue: "1015AM", Wed: "1015AM", Thu: "1015AM", Fri: "415PM", Sat: "OFF", Sun: "SET" },
-      ],
-    },
-  ];
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const dayKeys = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const shiftTypes = ["AM", "PM", "Mid-Shift"];
+] // Paste Week 2 data here
+            }
+        ];
 
-  let currentWeekIndex = 0;
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const dayKeys = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const shiftTypes = ["AM", "PM", "Mid-Shift"];
 
-  // Always read schedule data through this getter
-  function getActiveWeek() {
-    return scheduleWeeks[currentWeekIndex];
-  }
-  function getActiveData() {
-    return getActiveWeek().data;
-  }
+        let currentWeekIndex = 0;
+
+        let filters = {
+            days: [],
+            shifts: [],
+            names: []
+        };
+
+        function getActiveWeek() {
+            return scheduleWeeks[currentWeekIndex];
+        }
+
+        function getActiveData() {
+            return getActiveWeek().data;
+        }
 
         function classifyShift(shift) {
             if (!shift || shift === "OFF" || shift === "SET" || shift === "REQ") return null;
@@ -693,10 +720,66 @@
             return "Mid-Shift";
         }
 
+        // Dates for headers
+        function parseISODateLocal(iso) {
+            const [y, m, d] = iso.split("-").map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        function formatDateShort(d) {
+            return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        }
+
+        function getWeekDates(weekStartISO) {
+            const start = parseISODateLocal(weekStartISO);
+            const arr = [];
+            for (let i = 0; i < 7; i++) {
+                const dt = new Date(start);
+                dt.setDate(start.getDate() + i);
+                arr.push(dt);
+            }
+            return arr;
+        }
+
+        function setWeekLabel() {
+            const labelEl = document.getElementById("weekLabel");
+            if (!labelEl) return;
+
+            const week = getActiveWeek();
+            const dates = getWeekDates(week.weekStartISO);
+            labelEl.textContent = `Week of ${formatDateShort(dates[0])} to ${formatDateShort(dates[6])}`;
+        }
+
+        function switchWeek(delta) {
+            const nextIndex = currentWeekIndex + delta;
+            if (nextIndex < 0 || nextIndex >= scheduleWeeks.length) return;
+
+            currentWeekIndex = nextIndex;
+
+            // Clear name filters because week 2 might have different names
+            filters.names = [];
+            document.querySelectorAll('#nameFilter .filter-btn').forEach(btn => btn.classList.remove("active"));
+
+            setWeekLabel();
+            rebuildNameFilters();
+            renderTable();
+        }
+
+        function initializeWeekNav() {
+            const prevBtn = document.getElementById("prevWeekBtn");
+            const nextBtn = document.getElementById("nextWeekBtn");
+
+            if (prevBtn) prevBtn.addEventListener("click", () => switchWeek(-1));
+            if (nextBtn) nextBtn.addEventListener("click", () => switchWeek(1));
+
+            setWeekLabel();
+        }
+
         function initializeFilters() {
             // Day filters
             const dayContainer = document.getElementById("dayFilter");
-            days.forEach((day, index) => {
+            dayContainer.innerHTML = "";
+            days.forEach((day) => {
                 const btn = document.createElement("button");
                 btn.className = "filter-btn";
                 btn.textContent = day;
@@ -708,6 +791,7 @@
 
             // Shift filters
             const shiftContainer = document.getElementById("shiftFilter");
+            shiftContainer.innerHTML = "";
             shiftTypes.forEach(shift => {
                 const btn = document.createElement("button");
                 btn.className = "filter-btn";
@@ -718,9 +802,20 @@
                 shiftContainer.appendChild(btn);
             });
 
-            // Name filters
+            // Name filters (for current week)
+            rebuildNameFilters();
+
+            // Reset button event listener
+            document.getElementById("resetBtn").addEventListener("click", resetFilters);
+
+            renderTable();
+        }
+
+        function rebuildNameFilters() {
             const nameContainer = document.getElementById("nameFilter");
-            scheduleData.forEach(person => {
+            nameContainer.innerHTML = "";
+
+            getActiveData().forEach(person => {
                 const btn = document.createElement("button");
                 btn.className = "filter-btn";
                 btn.textContent = person.name;
@@ -729,11 +824,6 @@
                 btn.onclick = () => toggleFilter("names", person.name, btn);
                 nameContainer.appendChild(btn);
             });
-
-            // Reset button event listener
-            document.getElementById("resetBtn").addEventListener('click', resetFilters);
-
-            renderTable();
         }
 
         function toggleFilter(type, value, btn) {
@@ -755,325 +845,183 @@
         }
 
         function renderTable() {
-            // Determine which columns to show
-            let visibleDays = filters.days.length > 0 ? filters.days : days;
-            let visibleDayIndices = visibleDays.map(day => days.indexOf(day));
+            const activeWeek = getActiveWeek();
+            const activeData = getActiveData();
+            const weekDates = getWeekDates(activeWeek.weekStartISO);
 
-            // Build header
+            // Determine which columns to show
+            const visibleDays = filters.days.length > 0 ? filters.days : days;
+            const visibleDayIndices = visibleDays.map(day => days.indexOf(day));
+
+            // Build header (with dates)
             const thead = document.getElementById("tableHead");
             let headerHTML = "<tr><th>Team Member</th>";
             visibleDayIndices.forEach(index => {
-                headerHTML += `<th>${days[index]}</th>`;
+                const dateLabel = formatDateShort(weekDates[index]);
+                headerHTML += `<th>${days[index]}<br><span class="date-subheader">${dateLabel}</span></th>`;
             });
             headerHTML += "</tr>";
             thead.innerHTML = headerHTML;
 
             // Filter data
-<script>
-  let filters = {
-    days: [],
-    shifts: [],
-    names: []
-  };
+            const filteredData = activeData.filter(person => {
+                // Filter by name if selected
+                if (filters.names.length > 0 && !filters.names.includes(person.name)) return false;
 
-  function classifyShift(shift) {
-    if (!shift || shift === "OFF" || shift === "SET" || shift === "REQ") return null;
-    if (shift.includes("1015AM")) return "AM";
-    if (shift.includes("415PM")) return "PM";
-    return "Mid-Shift";
-  }
+                // Check if person matches day AND shift criteria
+                if (filters.days.length > 0 || filters.shifts.length > 0) {
+                    let matchesAllCriteria = true;
 
-  function parseISODateLocal(iso) {
-    // "YYYY-MM-DD" to local Date without timezone surprises
-    const [y, m, d] = iso.split("-").map(Number);
-    return new Date(y, m - 1, d);
-  }
+                    if (filters.days.length > 0) {
+                        let matchesDay = false;
 
-  function formatDateShort(d) {
-    // Example: Dec 25
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  }
+                        filters.days.forEach(day => {
+                            const dayIndex = days.indexOf(day);
+                            const dayKey = dayKeys[dayIndex];
+                            const shift = person[dayKey];
 
-  function getWeekDates(weekStartISO) {
-    const start = parseISODateLocal(weekStartISO);
-    const arr = [];
-    for (let i = 0; i < 7; i++) {
-      const dt = new Date(start);
-      dt.setDate(start.getDate() + i);
-      arr.push(dt);
-    }
-    return arr;
-  }
+                            if (filters.shifts.length > 0) {
+                                // Must match both day AND one of the shifts
+                                // Note: shift can be an array, so check each one
+                                const shiftList = Array.isArray(shift) ? shift : (shift ? [shift] : []);
+                                shiftList.forEach(s => {
+                                    const shiftType = classifyShift(s);
+                                    if (s && filters.shifts.includes(shiftType)) matchesDay = true;
+                                });
+                            } else {
+                                // Just must have a shift on that day (not OFF)
+                                if (shift && shift !== "OFF") matchesDay = true;
+                            }
+                        });
 
-  function setWeekLabel() {
-    const week = getActiveWeek();
-    const dates = getWeekDates(week.weekStartISO);
-    const startLabel = formatDateShort(dates[0]);
-    const endLabel = formatDateShort(dates[6]);
-    document.getElementById("weekLabel").textContent = `Week of ${startLabel} to ${endLabel}`;
-  }
+                        matchesAllCriteria = matchesDay;
+                    } else if (filters.shifts.length > 0) {
+                        // Only shift filter, check if they work any of those shifts on any day
+                        let hasShift = false;
+                        dayKeys.forEach(key => {
+                            const shiftVal = person[key];
+                            const shiftList = Array.isArray(shiftVal) ? shiftVal : (shiftVal ? [shiftVal] : []);
+                            shiftList.forEach(s => {
+                                const shiftType = classifyShift(s);
+                                if (filters.shifts.includes(shiftType)) hasShift = true;
+                            });
+                        });
+                        matchesAllCriteria = hasShift;
+                    }
 
-  function initializeWeekNav() {
-    document.getElementById("prevWeekBtn").addEventListener("click", () => switchWeek(-1));
-    document.getElementById("nextWeekBtn").addEventListener("click", () => switchWeek(1));
-    setWeekLabel();
-  }
+                    if (!matchesAllCriteria) return false;
+                }
 
-  function switchWeek(delta) {
-    const nextIndex = currentWeekIndex + delta;
-    if (nextIndex < 0 || nextIndex >= scheduleWeeks.length) return;
+                return true;
+            });
 
-    currentWeekIndex = nextIndex;
+            // Build body
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
 
-    // Clear only the name filter because week 2 might have different names
-    filters.names = [];
-    document.querySelectorAll('#nameFilter .filter-btn').forEach(btn => btn.classList.remove("active"));
-
-    setWeekLabel();
-    rebuildNameFilters();
-    renderTable();
-  }
-
-  function initializeFilters() {
-    // Day filters
-    const dayContainer = document.getElementById("dayFilter");
-    dayContainer.innerHTML = "";
-    days.forEach((day) => {
-      const btn = document.createElement("button");
-      btn.className = "filter-btn";
-      btn.textContent = day;
-      btn.dataset.value = day;
-      btn.dataset.type = "day";
-      btn.onclick = () => toggleFilter("days", day, btn);
-      dayContainer.appendChild(btn);
-    });
-
-    // Shift filters
-    const shiftContainer = document.getElementById("shiftFilter");
-    shiftContainer.innerHTML = "";
-    shiftTypes.forEach(shift => {
-      const btn = document.createElement("button");
-      btn.className = "filter-btn";
-      btn.textContent = shift;
-      btn.dataset.value = shift;
-      btn.dataset.type = "shift";
-      btn.onclick = () => toggleFilter("shifts", shift, btn);
-      shiftContainer.appendChild(btn);
-    });
-
-    // Name filters for current week
-    rebuildNameFilters();
-
-    // Reset button
-    document.getElementById("resetBtn").addEventListener("click", resetFilters);
-
-    renderTable();
-  }
-
-  function rebuildNameFilters() {
-    const nameContainer = document.getElementById("nameFilter");
-    nameContainer.innerHTML = "";
-
-    const activeData = getActiveData();
-    activeData.forEach(person => {
-      const btn = document.createElement("button");
-      btn.className = "filter-btn";
-      btn.textContent = person.name;
-      btn.dataset.value = person.name;
-      btn.dataset.type = "name";
-      btn.onclick = () => toggleFilter("names", person.name, btn);
-      nameContainer.appendChild(btn);
-    });
-  }
-
-  function toggleFilter(type, value, btn) {
-    const index = filters[type].indexOf(value);
-    if (index > -1) {
-      filters[type].splice(index, 1);
-      btn.classList.remove("active");
-    } else {
-      filters[type].push(value);
-      btn.classList.add("active");
-    }
-    renderTable();
-  }
-
-  function resetFilters() {
-    filters = { days: [], shifts: [], names: [] };
-    document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-    renderTable();
-  }
-
-  function renderTable() {
-    const activeWeek = getActiveWeek();
-    const activeData = getActiveData();
-    const weekDates = getWeekDates(activeWeek.weekStartISO);
-
-    // Determine which columns to show
-    const visibleDays = filters.days.length > 0 ? filters.days : days;
-    const visibleDayIndices = visibleDays.map(day => days.indexOf(day));
-
-    // Build header with dates
-    const thead = document.getElementById("tableHead");
-    let headerHTML = "<tr><th>Team Member</th>";
-    visibleDayIndices.forEach(index => {
-      const dateLabel = formatDateShort(weekDates[index]);
-      headerHTML += `<th>${days[index]}<br><span style="font-weight:500; color: var(--color-text-secondary);">${dateLabel}</span></th>`;
-    });
-    headerHTML += "</tr>";
-    thead.innerHTML = headerHTML;
-
-    // Filter data
-    const filteredData = activeData.filter(person => {
-      if (filters.names.length > 0 && !filters.names.includes(person.name)) return false;
-
-      if (filters.days.length > 0 || filters.shifts.length > 0) {
-        let matchesAllCriteria = true;
-
-        if (filters.days.length > 0) {
-          let matchesDay = false;
-
-          filters.days.forEach(day => {
-            const dayIndex = days.indexOf(day);
-            const dayKey = dayKeys[dayIndex];
-            const shift = person[dayKey];
-
-            if (filters.shifts.length > 0) {
-              const shiftType = classifyShift(shift);
-              if (shift && filters.shifts.includes(shiftType)) matchesDay = true;
-            } else {
-              if (shift && shift !== "OFF") matchesDay = true;
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${visibleDayIndices.length + 1}" class="no-results">No matches found</td></tr>`;
+                document.getElementById("resultsInfo").textContent = "No team members match your filters for this week.";
+                return;
             }
-          });
 
-          matchesAllCriteria = matchesDay;
-        } else if (filters.shifts.length > 0) {
-          let hasShift = false;
-          dayKeys.forEach(key => {
-            const shiftType = classifyShift(person[key]);
-            if (filters.shifts.includes(shiftType)) hasShift = true;
-          });
-          matchesAllCriteria = hasShift;
+            filteredData.forEach(person => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td class="name-cell">${person.name}</td>`;
+
+                visibleDayIndices.forEach(dayIndex => {
+                    const dayKey = dayKeys[dayIndex];
+                    const shiftData = person[dayKey];
+
+                    // Handle both single shifts (string) and multiple shifts (array)
+                    const shifts = Array.isArray(shiftData) ? shiftData : (shiftData ? [shiftData] : []);
+
+                    let cellHTML = "";
+                    if (shifts.length > 0) {
+                        cellHTML = shifts.map(shift => {
+                            const shiftType = classifyShift(shift);
+                            let badgeClass = "shift-off";
+
+                            if (shiftType === "AM") badgeClass = "shift-am";
+                            else if (shiftType === "PM") badgeClass = "shift-pm";
+                            else if (shiftType === "Mid-Shift") badgeClass = "shift-mid";
+                            else if (shift === "SET") badgeClass = "shift-set";
+                            else if (shift === "REQ") badgeClass = "shift-req";
+
+                            return `<span class="shift-badge ${badgeClass}">${shift}</span>`;
+                        }).join("<br>");
+                    } else {
+                        cellHTML = `<span class="shift-badge shift-off"></span>`;
+                    }
+
+                    const cell = document.createElement("td");
+                    cell.innerHTML = cellHTML;
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+
+            // Update results info
+            const filterSummary = [];
+            if (filters.days.length > 0) filterSummary.push(`${filters.days.join(", ")}`);
+            if (filters.shifts.length > 0) filterSummary.push(`${filters.shifts.join(", ")} shift${filters.shifts.length > 1 ? "s" : ""}`);
+            if (filters.names.length > 0) filterSummary.push(`${filters.names.join(", ")}`);
+
+            const summaryText = filterSummary.length > 0
+                ? `Showing ${filteredData.length} result${filteredData.length !== 1 ? "s" : ""} for: ${filterSummary.join(" + ")}`
+                : `Showing all ${filteredData.length} team members for this week`;
+
+            document.getElementById("resultsInfo").textContent = summaryText;
         }
 
-        if (!matchesAllCriteria) return false;
-      }
+        function enableSwipeWeekNavigation() {
+            const el = document.querySelector(".container");
+            if (!el) return;
 
-      return true;
-    });
+            let startX = 0;
+            let startY = 0;
+            let tracking = false;
 
-    // Build body
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
+            el.addEventListener("touchstart", (e) => {
+                if (!e.touches || e.touches.length !== 1) return;
+                tracking = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }, { passive: true });
 
-    if (filteredData.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${visibleDayIndices.length + 1}" class="no-results">No matches found</td></tr>`;
-      document.getElementById("resultsInfo").textContent = "No team members match your filters for this week.";
-      return;
-    }
+            el.addEventListener("touchmove", (e) => {
+                if (!tracking || !e.touches || e.touches.length !== 1) return;
 
-    filteredData.forEach(person => {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td class="name-cell">${person.name}</td>`;
+                const dx = e.touches[0].clientX - startX;
+                const dy = e.touches[0].clientY - startY;
 
-      visibleDayIndices.forEach(dayIndex => {
-        const dayKey = dayKeys[dayIndex];
-        const shiftData = person[dayKey];
+                // If user is scrolling vertically, do not treat as a swipe
+                if (Math.abs(dy) > Math.abs(dx)) return;
 
-        const shifts = Array.isArray(shiftData)
-          ? shiftData
-          : (shiftData ? [shiftData] : []);
+                // Prevent horizontal bounce while swiping
+                e.preventDefault();
+            }, { passive: false });
 
-        let cellHTML = "";
-        if (shifts.length > 0) {
-          cellHTML = shifts.map(shift => {
-            const shiftType = classifyShift(shift);
-            let badgeClass = "shift-off";
+            el.addEventListener("touchend", (e) => {
+                if (!tracking) return;
+                tracking = false;
 
-            if (shiftType === "AM") badgeClass = "shift-am";
-            else if (shiftType === "PM") badgeClass = "shift-pm";
-            else if (shiftType === "Mid-Shift") badgeClass = "shift-mid";
-            else if (shift === "SET") badgeClass = "shift-set";
-            else if (shift === "REQ") badgeClass = "shift-req";
+                const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
+                const dx = endX - startX;
 
-            return `<span class="shift-badge ${badgeClass}">${shift}</span>`;
-          }).join("<br>");
-        } else {
-          cellHTML = `<span class="shift-badge shift-off"></span>`;
+                // Swipe threshold
+                if (Math.abs(dx) < 60) return;
+
+                // Swipe left = next week, swipe right = previous week
+                if (dx < 0) switchWeek(1);
+                else switchWeek(-1);
+            }, { passive: true });
         }
 
-        const cell = document.createElement("td");
-        cell.innerHTML = cellHTML;
-        row.appendChild(cell);
-      });
-
-      tbody.appendChild(row);
-    });
-
-    // Update results info
-    const filterSummary = [];
-    if (filters.days.length > 0) filterSummary.push(`${filters.days.join(", ")}`);
-    if (filters.shifts.length > 0) filterSummary.push(`${filters.shifts.join(", ")} shift${filters.shifts.length > 1 ? "s" : ""}`);
-    if (filters.names.length > 0) filterSummary.push(`${filters.names.join(", ")}`);
-
-    const summaryText = filterSummary.length > 0
-      ? `Showing ${filteredData.length} result${filteredData.length !== 1 ? "s" : ""} for: ${filterSummary.join(" + ")}`
-      : `Showing all ${filteredData.length} team members for this week`;
-
-    document.getElementById("resultsInfo").textContent = summaryText;
-  }
-
-  function enableSwipeWeekNavigation() {
-    // Swipe on the main container
-    const el = document.querySelector(".container");
-    if (!el) return;
-
-    let startX = 0;
-    let startY = 0;
-    let isTracking = false;
-
-    el.addEventListener("touchstart", (e) => {
-      if (!e.touches || e.touches.length !== 1) return;
-      isTracking = true;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-
-    el.addEventListener("touchmove", (e) => {
-      if (!isTracking || !e.touches || e.touches.length !== 1) return;
-
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-
-      // If user is mostly scrolling vertically, do nothing
-      if (Math.abs(dy) > Math.abs(dx)) return;
-
-      // Prevent horizontal scroll bounce while swiping
-      e.preventDefault();
-    }, { passive: false });
-
-    el.addEventListener("touchend", (e) => {
-      if (!isTracking) return;
-      isTracking = false;
-
-      const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
-      const dx = endX - startX;
-
-      // Threshold
-      if (Math.abs(dx) < 60) return;
-
-      // Swipe left means next week, swipe right means prev week
-      if (dx < 0) switchWeek(1);
-      else switchWeek(-1);
-    }, { passive: true });
-  }
-
-  // Boot
-  initializeWeekNav();
-  initializeFilters();
-  enableSwipeWeekNavigation();
-</script>
-
+        initializeWeekNav();
+        initializeFilters();
+        enableSwipeWeekNavigation();
     </script>
 </body>
 </html>
